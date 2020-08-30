@@ -1,20 +1,17 @@
-import numpy as np
-import kvaser.__kvaser_c__ as kvaserc
 
-
-def expit(x):
-    """Sigmoid function (Inverse Logit)
-
-    Parameters
-    ----------
-    x: numpy.array
-
-    Returns
-    -------
-    numpy.array
-        matrix with elementwise inverse logit
-
+def filesize(size, digits=2):
+    """From bytes to kilo, mega, tera
     """
-
-    val = np.array(x)
-    return kvaserc.expit(val)
+    power = 1024
+    Dic_powerN = {0: 'B', 1: 'kB', 2: 'MB', 3: 'GB', 4: 'TB'}
+    if size < power:
+        return size, Dic_powerN[0]
+    n = 1
+    if size <= power**2:
+        size /= power
+    else:
+        while size  > power:
+            n  += 1
+            size /= power**n
+    size = round(size*(10**digits))/(10**digits)
+    return size, Dic_powerN[n]

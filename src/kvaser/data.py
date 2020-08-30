@@ -1,7 +1,5 @@
 import pkg_resources
 import pandas as pd
-import numpy as np
-import kvaser
 
 
 def getdata(dataset:str='d', list:bool=False):
@@ -34,8 +32,8 @@ def getdata(dataset:str='d', list:bool=False):
 
     """
     if list:
-        return(pkg_resources.resource_listdir('kvaser','data'))
-    filename='data/' + dataset + '.csv.gz'
+        return(pkg_resources.resource_listdir('kvaser', 'data'))
+    filename = 'data/' + dataset + '.csv.gz'
     inp = pkg_resources.resource_filename('kvaser', filename)
     data = pd.read_csv(inp, sep=',', header=0)
     return(data)
