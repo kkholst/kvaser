@@ -47,7 +47,6 @@ jobs:
       install:
         - pip3 install -r doc/requirements.txt
       script:
-        - cd python-package
         - python3 setup.py install
         - python3 -m kvaser
         - pytest --cov=kvaser tests/
