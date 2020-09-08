@@ -1,12 +1,12 @@
 # coding: utf-8
 
 __name__        = "kvaser"
-__version__     = "0.0.1"
+__version__     = "0.0.2"
 __license__     = "Apache Software License"
 __description__ = "Various utility functions."
 __author__      = u"Klaus Kähler Holst"
 __email__       = "klaus.holst@maersk.com"
-__url__         = "https://targetlib.org/python/"
+__url__         = "https://github.com/kkholst/kvaser"
 __copyright__   = u"Copyright 2019-2020, Klaus Kähler Holst"
 __summary__     = "Utility functions"
 __keywords__    = "tools, utilities"

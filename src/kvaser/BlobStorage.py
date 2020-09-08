@@ -5,6 +5,7 @@
 #
 
 import pandas as pd
+import pickle
 import os
 from io import StringIO, BytesIO
 from azure.storage.blob import BlobServiceClient
@@ -87,6 +88,44 @@ class BlobStorage:
         for x in self.blobservice.list_containers():
             print(x.name)
 
+    def read_str(self, file):
+        blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
+        dl = blob_client.download_blob()
+        return dl.content_as_text()
+
+    def write_str(self, string, file):
+        blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
+        buf = StringIO()
+        try:
+            buf.write(str(string))
+            val = blob_client.upload_blob(buf.getvalue(), blob_type='BlockBlob', overwrite=True)
+        finally:
+            buf.close()
+        return val
+
+    def write(self, obj, file, type='pickle'):
+        """Write pickle file on blob storage
+        """
+        blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
+        buf = BytesIO()
+        try:
+            if type=='parquet':
+                obj.to_parquet(buf, index=False)
+            else:
+                pickle.dump(obj, buf)
+            val = blob_client.upload_blob(buf.getvalue(), blob_type='BlockBlob', overwrite=True)
+        finally:
+            buf.close()
+        return val
+
+    def read(self, file):
+        """Read pickle file on blob storage
+        """
+        blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
+        dl = blob_client.download_blob()
+        obj = pickle.load(BytesIO(dl.content_as_bytes()))
+        return obj
+
     def read_pq(self, file):
         """Read parquet file from blob storage
         """
@@ -98,14 +137,7 @@ class BlobStorage:
     def write_pq(self, df, file):
         """Write pandas dataframe to parquet file on blob storage
         """
-        blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
-        buf = BytesIO()
-        try:
-            df.to_parquet(buf, index=False)
-            val = blob_client.upload_blob(buf.getvalue(), blob_type='BlockBlob', overwrite=True)
-        finally:
-            buf.close()
-        return val
+        return write(self, df, file, type='parquet')
 
     def read_csv(self, file):
         """Read csv file from blob storage
