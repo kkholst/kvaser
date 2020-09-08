@@ -6,8 +6,8 @@ jobs:
 
     - name: "python: source"
       language: python
-      # Only run on deploy branch or commits tagged 'py_v...'
-      if: (branch IN (deploy)) OR (tag =~ ^py_v)
+      # Only run on deploy branch or commits tagged 'v_...'
+      if: (branch IN (deploy)) OR (tag =~ ^v_)
       cache: pip
       addons:
         apt:
@@ -18,7 +18,6 @@ jobs:
       install:
         - pip3 install pytest pytest-runner pytest-cov scipy patsy numpy pandas statsmodels
       script:
-        - cd python-package
         - python3 setup.py install
         - python3 setup.py test
         - python3 -m kvaser
