@@ -93,12 +93,21 @@ class BlobStorage:
         dl = blob_client.download_blob()
         return dl.content_as_text()
 
-    def write_str(self, string, file):
+    def print(self, file):
+        print(self.read_str(file))
+
+    def write_str(self, string, file, append=True, sep=os.linesep):
         blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
+        try:
+            blob_client.get_blob_properties()
+            if not append:
+                blob_client.create_append_blob()
+        except az.exceptions.ResourceNotFoundError:
+            blob_client.create_append_blob()
         buf = StringIO()
         try:
-            buf.write(str(string))
-            val = blob_client.upload_blob(buf.getvalue(), blob_type='BlockBlob', overwrite=True)
+            buf.writelines(str(string) + sep)
+            val = blob_client.upload_blob(buf.getvalue(), blob_type='AppendBlob')
         finally:
             buf.close()
         return val
@@ -109,7 +118,7 @@ class BlobStorage:
         blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
         buf = BytesIO()
         try:
-            if type=='parquet':
+            if type == 'parquet':
                 obj.to_parquet(buf, index=False)
             else:
                 pickle.dump(obj, buf)
@@ -118,26 +127,27 @@ class BlobStorage:
             buf.close()
         return val
 
-    def read(self, file):
+    def read(self, file, type='pickle'):
         """Read pickle file on blob storage
         """
         blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
         dl = blob_client.download_blob()
-        obj = pickle.load(BytesIO(dl.content_as_bytes()))
-        return obj
+        obj = BytesIO(dl.content_as_bytes())
+        if type == 'parquet':
+            val = pickle.load(obj)
+        else:
+            val = pd.read_parquet(obj)
+        return val
 
     def read_pq(self, file):
         """Read parquet file from blob storage
         """
-        blob_client = self.blobservice.get_blob_client(container=self.container_name, blob=file)
-        dl = blob_client.download_blob()
-        df = pd.read_parquet(BytesIO(dl.content_as_bytes()))
-        return df
+        return self.read(file, type='parquet')
 
     def write_pq(self, df, file):
         """Write pandas dataframe to parquet file on blob storage
         """
-        return write(self, df, file, type='parquet')
+        return self.write(df, file, type='parquet')
 
     def read_csv(self, file):
         """Read csv file from blob storage
