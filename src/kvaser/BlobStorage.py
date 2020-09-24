@@ -25,7 +25,7 @@ class BlobStorage:
     container = None
     container_name = ""
 
-    def __init__(self, container_str, connect_str=None):
+    def __init__(self, container_str=None, connect_str=None):
         """Class initialization
 
         Examples
@@ -54,11 +54,10 @@ class BlobStorage:
         if connect_str is None:
             connect_str = os.environ['AZURE_STORAGE_CONNECTION_STRING']
         self.blobservice = BlobServiceClient.from_connection_string(connect_str)
-        if container_str is None:
-            self.blobservice.list_containers().next
-        self.container(container_str)
+        if container_str is not(None):
+            self.select_container(container_str)
 
-    def container(self, name):
+    def select_container(self, name):
         """Switch container.
 
         A new container will be created if the specified one does not yet exists.

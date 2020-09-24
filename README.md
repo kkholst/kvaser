@@ -1,6 +1,6 @@
 # Kvaser
 
-Various utility functions
+Various utility functions.
 
-The implemention currently includes
 - **BlobStorage**
+-
