@@ -44,7 +44,7 @@ setuptools.setup(
     install_requires=[
         'pandas>=1.0.3',
         'numpy>=1.15',
-        'pyarrow>=1.0',
+        #'pyarrow>=1.0',
         'azure-storage-blob>=12.0'
     ],
     package_data={pkg: ['data/*.dat', 'data/*.gz']},

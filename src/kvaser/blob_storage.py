@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Wrapper for interacting with Azure Blob Storage
-# Copyright (c) 2020 Klaus K. Holst.  All rights reserved.
+# Copyright (c) 2020-2021 Klaus K. Holst.  All rights reserved.
 #
 
 import pandas as pd
@@ -14,7 +14,7 @@ from .__utils__ import filesize # noqa F403
 # import pyarrow.parquet as pq
 
 
-class BlobStorage:
+class blob_storage:
     """Simple class for reading and writing files on Azure Blob Storage
 
     The connection string can either be given at the class
@@ -31,7 +31,7 @@ class BlobStorage:
         Examples
         --------
         import kvaser
-        blob = kvaser.BlobStorage('my-kvaser-test')
+        blob = kvaser.blob_storage('my-kvaser-test')
         df = kvaser.getdata() # A test pandas dataframe
         blob.write_pq(df, 'a.pq')
         {'etag': '"0x8D84D076069EDBB"', 'last_modified': datetime.datetime(2020, 8, 30, 17 ...
@@ -48,8 +48,8 @@ class BlobStorage:
             Connection string
         Returns
         -------
-        BlobStorage
-            BlobStorage object
+        blob_storage
+            blob_storage object
         """
         if connect_str is None:
             connect_str = os.environ['AZURE_STORAGE_CONNECTION_STRING']
@@ -69,16 +69,16 @@ class BlobStorage:
             Name of container
         """
         self.container_name = name
-        self.container = self.blobservice.get_container_client(name)
+        self.active_container = self.blobservice.get_container_client(name)
         try:
-            self.container.get_container_properties()
+            self.active_container.get_container_properties()
         except az.exceptions.ResourceNotFoundError:
-            self.container = self.container.create_container()
+            self.active_container = self.container.create_container()
 
     def list(self):
         """List blobs in the container
         """
-        for x in self.container.list_blobs():
+        for x in self.active_container.list_blobs():
             sz = filesize(x.size)
             print(x.name + '\t' + str(sz[0]) + ' ' + sz[1])
 
@@ -134,9 +134,9 @@ class BlobStorage:
         dl = blob_client.download_blob()
         obj = BytesIO(dl.content_as_bytes())
         if type == 'parquet':
-            val = pickle.load(obj)
-        else:
             val = pd.read_parquet(obj)
+        else:
+            val = pickle.load(obj)
         return val
 
     def read_pq(self, file):
