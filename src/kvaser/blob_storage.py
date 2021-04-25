@@ -22,7 +22,7 @@ class blob_storage:
     environment variable AZURE_STORAGE_CONNECTION_STRING
     """
     blobservice = None
-    container = None
+    active_container = None
     container_name = ""
 
     def __init__(self, container_str=None, connect_str=None):
@@ -72,7 +72,7 @@ class blob_storage:
         try:
             self.active_container.get_container_properties()
         except az.exceptions.ResourceNotFoundError:
-            self.active_container = self.container.create_container()
+            self.active_container = self.active_container.create_container()
 
     def list(self):
         """List blobs in the container
