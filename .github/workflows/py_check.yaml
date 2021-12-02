@@ -1,0 +1,34 @@
+name: target tests
+
+on: [push]
+
+jobs:
+  python_package:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+      - name: Checkout repository incl. submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r doc/requirements.txt
+      - name: Check
+        run: |
+          python3 setup.py install
+          python3 -m kvaser
+          pytest --cov=kvaser tests/
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: false
