@@ -28,7 +28,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip twine
+          python3 -m pip install --upgrade pip twine wheel
       - name: Build source package
         run: |
           python3 setup.py sdist
