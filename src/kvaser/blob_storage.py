@@ -25,7 +25,7 @@ class blob_storage:
     active_container = None
     container_name = ""
 
-    def __init__(self, container_str=None, connect_str=None):
+    def __init__(self, container_str=None, connect_str=None, account_url=None, credential=None):
         """Class initialization
 
         Examples
@@ -45,15 +45,29 @@ class blob_storage:
         container_str: str
             Name of container to use
         connect_str: str
-            Connection string
+            Connection string (optional). If 'None' an attempt to retrieve this
+            from the environment variable AZURE_STORAGE_CONNECTION_STRING will be made
+        credential: str
+            Account URL (optional)
+        credential: str
+            SAS token (optional). If 'None' an attempt to retrieve this
+            from the environment variable AZURE_SAS_TOKEN will be made
         Returns
         -------
         blob_storage
             blob_storage object
         """
         if connect_str is None:
-            connect_str = os.environ['AZURE_STORAGE_CONNECTION_STRING']
-        self.blobservice = BlobServiceClient.from_connection_string(connect_str)
+            connect_str = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
+        if credential is None:
+            credential = os.environ.get('AZURE_SAS_TOKEN')
+
+        if (not connect_str is None):
+            self.blobservice = BlobServiceClient.from_connection_string(connect_str)
+        else:
+            self.blobservice = BlobServiceClient.from_connection_string(account_url=account_url,
+                                                                        credential=credential)
+
         if container_str is not(None):
             self.select_container(container_str)
 
