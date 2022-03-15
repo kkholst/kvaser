@@ -20,11 +20,11 @@ def reload(pkg):
     Parameters
     ----------
     pkg: string
-       Module name
+       Regular expression for module name(s)
     """
 
 
-    mod = list(filter(lambda x: re.match("^"+pkg, x),
+    mod = list(filter(lambda x: re.match(pkg, x),
                       list(sys.modules.keys())))
     for m in mod:
         try:
