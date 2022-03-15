@@ -1,5 +1,6 @@
 import importlib
 import re
+import sys
 
 def reload(pkg):
     """Reload package modules
