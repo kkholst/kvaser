@@ -1,3 +1,4 @@
+.DS_Store
 src/kvaser/test.py
 config.py
 doc/_build/*
