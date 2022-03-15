@@ -2,7 +2,7 @@ import importlib
 import re
 import sys
 
-def reload(pkg):
+def reload(pkg, verbose=False):
     """Reload package modules
 
     Examples
@@ -21,14 +21,17 @@ def reload(pkg):
     ----------
     pkg: string
        Regular expression for module name(s)
+    verbose: logical
+       Print extra information
     """
-
 
     mod = list(filter(lambda x: re.match(pkg, x),
                       list(sys.modules.keys())))
     for m in mod:
         try:
             importlib.reload(sys.modules[m])
-            print(m)
-        except:
-            None
+            if verbose:
+                print(m)
+        except Exception as e:
+            if verbose:
+                print(e)
