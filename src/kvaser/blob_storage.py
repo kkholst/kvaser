@@ -25,7 +25,8 @@ class blob_storage:
     active_container = None
     container_name = ""
 
-    def __init__(self, container_str=None, connect_str=None, account_url=None, credential=None):
+    def __init__(self, container=None, connect_str=None,
+                 account=None, credential=None, account_url=None, ):
         """Class initialization
 
         Examples
@@ -42,34 +43,43 @@ class blob_storage:
 
         Parameters
         ----------
-        container_str: str
+        container: str
             Name of container to use
         connect_str: str
             Connection string (optional). If 'None' an attempt to retrieve this
             from the environment variable AZURE_STORAGE_CONNECTION_STRING will be made
-        credential: str
-            Account URL (optional)
+        account: str
+            Account (optional)
         credential: str
             SAS token (optional). If 'None' an attempt to retrieve this
             from the environment variable AZURE_SAS_TOKEN will be made
+        account_url: str
+            Account URL (optional)
         Returns
         -------
         blob_storage
             blob_storage object
         """
-        if connect_str is None:
-            connect_str = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
+        if connect_str is None and credential is None:
+            connect_str = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
         if credential is None:
-            credential = os.environ.get('AZURE_SAS_TOKEN')
+            credential = os.getenv('AZURE_SAS_TOKEN')
 
-        if (not connect_str is None):
+        if account_url is None:
+            if account is None:
+                account = os.getenv("OAUTH_STORAGE_ACCOUNT_NAME")
+            account_url = "https://{}.blob.core.windows.net".format(account)
+
+        if connect_str is not None:
+            print("Connection string")
             self.blobservice = BlobServiceClient.from_connection_string(connect_str)
         else:
-            self.blobservice = BlobServiceClient.from_connection_string(account_url=account_url,
-                                                                        credential=credential)
+            # print("Credential")
+            self.blobservice = BlobServiceClient(account_url=account_url,
+                                                 credential=credential)
 
-        if container_str is not(None):
-            self.select_container(container_str)
+        if container is not None:
+            self.select_container(container)
 
     def select_container(self, name):
         """Switch container.
