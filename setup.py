@@ -44,6 +44,7 @@ setuptools.setup(
     install_requires=[
         'pandas>=1.0.3',
         'numpy>=1.15',
+        'rich',
         #'pyarrow>=1.0',
         'azure-storage-blob>=12.0'
     ],
