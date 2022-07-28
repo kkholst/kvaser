@@ -15,10 +15,6 @@ about = {}
 with open(os.path.join(base_dir, 'src', pkg, '__about__.py')) as f:
     exec(f.read(), about)
 
-
-#scripts =
-scripts = None
-
 setuptools.setup(
     name=about['__name__'],
     version=about['__version__'],
@@ -40,7 +36,7 @@ setuptools.setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent'
     ],
-    # scripts=list(map(lambda x: 'bin/'+x, os.listdir('bin'))),
+    scripts=list(map(lambda x: 'bin/'+x, os.listdir('bin'))),
     install_requires=[
         'pandas>=1.0.3',
         'numpy>=1.15',
