@@ -3,11 +3,12 @@
 #
 # Author: Klaus K. Holst
 #
-# kvaser multiple file processer
+# batch file processer
 #
 
 import kvaser as kv
 import argparse
+import sys
 import re
 import os
 import subprocess
@@ -42,26 +43,27 @@ if __name__ == '__main__':
 
 
    args = parser.parse_args()
+   if len(sys.argv)==1:
+      parser.print_help()
+      exit(0)
    match = args.match
    replacement = args.replace
-
    filelist = [f for f in os.listdir(args.path) if re.search(match, f)]
-
-   console = Console()
    cmd = ' '.join(args.cmd)
-   # print("'" + cmd + "'" + "\n")
    verbose = not args.silent
+
    base_hd = Style.parse("bold red") + Style(underline=True)
+   console = Console()
 
    for filename in filelist:
       if replacement is None:
          nfilename = filename
       else:
          nfilename = re.sub(match, replacement, filename, count=1)
-      if verbose and cmd == '':
-         console.print(filename, ' -> ', nfilename, style=Style.parse("red"))
       filename = os.path.join(args.path, filename)
       nfilename = os.path.join(args.path, nfilename)
+      if cmd == '' and verbose:
+         console.print(filename + ' -> ' + nfilename)
       if cmd != '':
          cmd0 = cmd
          if re.search(input_str, cmd0):

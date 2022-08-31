@@ -1,5 +1,3 @@
-import numpy as np
-from math import tanh, exp
 
 def test_is_string(caplog):
     '''

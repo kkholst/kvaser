@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+#
+# Data examples
+# Copyright (c) 2019-2022 Klaus K. Holst.  All rights reserved.
+
 import pkg_resources
 import pandas as pd
 

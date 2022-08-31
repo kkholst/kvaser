@@ -41,6 +41,9 @@ setuptools.setup(
         'pandas>=1.0.3',
         'numpy>=1.15',
         'rich',
+        'datetime',
+        'plotly>=5.1.0',
+        'pytz',
         #'pyarrow>=1.0',
         'azure-storage-blob>=12.0'
     ],

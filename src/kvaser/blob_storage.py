@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Wrapper for interacting with Azure Blob Storage
-# Copyright (c) 2020-2021 Klaus K. Holst.  All rights reserved.
+# Copyright (c) 2020-2022 Klaus K. Holst.  All rights reserved.
 #
 
 import pandas as pd
