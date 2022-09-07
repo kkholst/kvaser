@@ -5,19 +5,16 @@
 import pandas as pd
 
 def filesize(size, digits=2):
-    r"""From bytes to kilo, mega, tera
+    r"""From bytes to kilo, mega, giga, tera
     """
-    power = 1024
+    power = 1024.0
     Dic_powerN = {0: 'B', 1: 'kB', 2: 'MB', 3: 'GB', 4: 'TB'}
     if size < power:
         return size, Dic_powerN[0]
-    n = 1
-    if size <= power**2:
+    n = 0
+    while size > power:
+        n  += 1
         size /= power
-    else:
-        while size  > power:
-            n  += 1
-            size /= power**n
     size = round(size*(10**digits))/(10**digits)
     return size, Dic_powerN[n]
 
