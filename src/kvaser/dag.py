@@ -19,33 +19,37 @@ class dag:
         r"""
         """
         self.G = nx.DiGraph()
-        self.var = {}
+        self.dist = {}
 
     def regression(self, y, x=[]):
         self.G.add_node(y)
-        if y not in self.var.keys():
+        if y not in self.dist.keys():
             self.distribution(y)
         for v in x:
             self.G.add_edge(v, y)
-            if v not in self.var.keys():
+            if v not in self.dist.keys():
                 self.distribution(v)
 
     def distribution(self, y, generator=kv.normal()):
         r"""Set distribution of variable"""
         self.G.add_node(y)
-        self.var[y] = generator
+        self.dist[y] = generator
 
     def simulate(self, n=1, p={}):
         deg = dict(self.G.in_degree)
         vv = list(self.G.nodes)
+        n = int(n)
         res = np.ndarray((n, len(vv)))
 
         p0 = {}
         for y in vv:
+            p0[y] = 0.0
+            if y in p.keys():
+                p0[y] = p[y]
             par = self.G.predecessors(y)
             for x in par:
                 pname = y + '~' + x
-                p0[pname] =1
+                p0[pname] = 1
                 if pname in p.keys():
                     p0[pname] = p[pname]
 
@@ -57,13 +61,12 @@ class dag:
                     if all(x<0 for x in subdict.values()):
                         deg[v] = -1
                         pos = vv.index(v)
-                        lp = np.repeat([0.0], n)
-                        # print("Variable :" + v)
+                        lp = np.repeat([float(p0[v])], n)
                         for x in par:
                             pname = v + '~' + x
                             posx = int(vv.index(x))
                             lp += p0[pname]*res[:,posx]
-                        y = np.float64(self.var[v].simulate(lp=lp))
+                        y = np.float64(self.dist[v].simulate(lp=lp))
                         res[:,pos] = y
         df = pd.DataFrame(res)
         df.columns = vv
@@ -79,7 +82,7 @@ class dag:
             parents = list(self.G.predecessors(v))
             st += v + ' ~ ' + ' + '.join(parents) + '\n'
         st += '\n'
-        for k,v in self.var.items():
+        for k,v in self.dist.items():
             st += str(k) + ': ' + str(v) + '\n'
         return st
 
