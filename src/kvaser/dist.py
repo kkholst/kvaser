@@ -1,18 +1,30 @@
-#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Distribution classes
+# Copyright (c) 2019-2022 Klaus K. Holst.  All rights reserved.
 
 import numpy as np
+
+def randgen(func):
+    def wrapper(*args, **kwargs):
+        if len(args)>0:
+            kwargs.setdefault('rng', args[0].rng)
+            if kwargs.get('rng') is None:
+                kwargs['rng'] = args[0].rng
+        res = func(*args, **kwargs)
+        return res
+        ## After the function is called...
+    return wrapper
 
 class Dist:
     r"""Probability distribution class.
     Super class, not to be called directly
     """
-
-    rng = np.random.default_rng()
     name = 'Generic'
-    meanpar = 'loc'
 
-    def gen(self, size, **kwargs):
-        return None
+    @randgen
+    def gen(self, rng=None, *args, **kwargs):
+        return rng
 
     @staticmethod
     def invlink(x):
@@ -36,7 +48,7 @@ class Dist:
         self.kparam = kwargs
         self.rng = np.random.default_rng(seed)
 
-    def simulate(self, mean=None, lp=None):
+    def simulate(self, lp=None, rng=None):
         r"""Simulation method
 
         Parameters
@@ -47,12 +59,12 @@ class Dist:
         ----------
 
         """
-        if lp is not None:
-            mean = self.invlink(lp)
-        par = {}
-        par[self.meanpar] = mean
-
-        return self.gen(**par, **self.kparam, size=len(mean))
+        mpar = self.invlink(lp)
+        # par = {}
+        # par[self.meanpar] = mean
+        # res = self.gen(**par, **self.kparam, size=len(mean), rng=rng)
+        res = self.gen(param=mpar, **self.kparam, rng=rng)
+        return res
 
     def __repr__(self):
         return self.name + ' distribution ' + \
@@ -65,24 +77,25 @@ class Dist:
 
 class normal(Dist):
     r"""Normal distribution class
-    constructor arguments:
-    loc: float or array_like of floats
-         Mean
+
+    Constructor arguments:
+
     scale: float or array_like of floats
          Standard deviation
     """
-    def gen(self, size, **kwargs):
-        return self.rng.normal(size=size, **kwargs)
     name = 'Normal'
-    meanpar = 'loc'
+
+    @randgen
+    def gen(self, param, rng, **kwargs):
+        res = rng.normal(loc=param, **kwargs)
+        return res
 
 
 class bernoulli(Dist):
     name = 'Binomial'
-    meanpar = 'p'
-
-    def gen(self, size, **kwargs):
-        return self.rng.binomial(size=size, n=1, **kwargs)
+    @randgen
+    def gen(self, param, rng, **kwargs):
+        return self.rng.binomial(p=param, n=1, **kwargs)
 
     @staticmethod
     def invlink(x):
@@ -92,8 +105,9 @@ class bernoulli(Dist):
 class poisson(Dist):
     name = 'Poisson'
     meanpar = 'lam'
-    def gen(self, size, **kwargs):
-        return self.rng.poisson(size=size, **kwargs)
+    @randgen
+    def gen(self, param, rng, **kwargs):
+        return rng.poisson(lam=param, **kwargs)
 
     @staticmethod
     def invlink(x):
@@ -108,8 +122,6 @@ class discrete(Dist):
         self.values = np.array(values)
         self.p = np.array(p)
 
-    def gen(self, size, **kwargs):
-        return self.rng.choice(a=self.values, p=self.p, size=size)
-
-
-
+    @randgen
+    def gen(self, param, rng, **kwargs):
+        return rng.choice(a=self.values, p=self.p, size=len(param))

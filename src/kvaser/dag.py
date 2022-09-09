@@ -7,9 +7,9 @@ import kvaser as kv
 import networkx as nx
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image # Python Imaging library
 from io import BytesIO
-import pydot
+import pydot # graphviz/dot
 
 class dag:
     r"""DAG model class
@@ -35,7 +35,7 @@ class dag:
         self.G.add_node(y)
         self.dist[y] = generator
 
-    def simulate(self, n=1, p={}):
+    def simulate(self, n=1, p={}, file=None, rng=None):
         deg = dict(self.G.in_degree)
         vv = list(self.G.nodes)
         n = int(n)
@@ -66,10 +66,13 @@ class dag:
                             pname = v + '~' + x
                             posx = int(vv.index(x))
                             lp += p0[pname]*res[:,posx]
-                        y = np.float64(self.dist[v].simulate(lp=lp))
+                        y = np.float64(self.dist[v].simulate(lp=lp, rng=rng))
                         res[:,pos] = y
         df = pd.DataFrame(res)
         df.columns = vv
+        if file is not None:
+            df.to_csv(file)
+            return None
         return df
 
     def plot(self):
