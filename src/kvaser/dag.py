@@ -7,7 +7,7 @@ import kvaser as kv
 import networkx as nx
 import numpy as np
 import pandas as pd
-from PIL import Image # Python Imaging library
+from Pillow import Image # Python Imaging library
 from io import BytesIO
 import pydot # graphviz/dot
 

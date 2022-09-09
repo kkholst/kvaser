@@ -46,6 +46,7 @@ setuptools.setup(
         'pytz',
         'networkx',
         'pydot',
+        'Pillow',
         #'pyarrow>=1.0',
         'azure-storage-blob>=12.0'
     ],
