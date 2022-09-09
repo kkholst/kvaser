@@ -45,7 +45,6 @@ setuptools.setup(
         'plotly>=5.1.0',
         'pytz',
         'networkx',
-        'PIL',
         'pydot',
         #'pyarrow>=1.0',
         'azure-storage-blob>=12.0'

@@ -153,7 +153,7 @@ class dag:
 
         which draws 10 simulations from the model
 
-        .. math:: Y\sim \operatorname{pois}\left\{\exp(-1 + 2x + z)\right\}
+        .. math:: y|x,z \sim \operatorname{pois}\left\{\exp(-1 + 2x + z)\right\}
 
         """
         deg = dict(self.G.in_degree)

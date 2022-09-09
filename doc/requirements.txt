@@ -7,7 +7,6 @@ datetime
 plotly>=5.1.0
 pytz
 networkx
-PIL
 pydot
 
 
