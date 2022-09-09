@@ -1,7 +1,7 @@
 # coding: utf-8
 
 __name__        = "kvaser"
-__version__     = "0.1.3"
+__version__     = "0.1.4"
 __license__     = "Apache Software License"
 __description__ = "Various utility functions."
 __author__      = u"Klaus Kähler Holst"
