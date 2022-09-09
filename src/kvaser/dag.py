@@ -7,7 +7,7 @@ import kvaser as kv
 import networkx as nx
 import numpy as np
 import pandas as pd
-from Pillow import Image # Python Imaging library
+import Pillow # Python Imaging library
 from io import BytesIO
 import pydot # graphviz/dot
 
@@ -199,7 +199,7 @@ class dag:
         r"""Plot DAG model
         """
         pdot = nx.nx_pydot.to_pydot(self.G)
-        Image.open(BytesIO(pdot.create_png())).show()
+        Pillow.Image.open(BytesIO(pdot.create_png())).show()
 
     def __str__(self):
         st = ''
