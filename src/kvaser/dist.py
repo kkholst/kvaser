@@ -58,6 +58,7 @@ class Dist:
         Returns
         ----------
 
+
         """
         mpar = self.invlink(lp)
         # par = {}

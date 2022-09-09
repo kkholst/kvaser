@@ -105,7 +105,11 @@ markdown:
 
 .PHONY: doc
 doc:
-	cd doc; $(MAKE) html
+	@cd doc; $(MAKE) html
+
+.PHONY: d
+d: doc
+	@open doc/build/html/index.html
 
 ################################################################################
 
