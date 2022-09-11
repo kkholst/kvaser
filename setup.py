@@ -49,7 +49,7 @@ setuptools.setup(
         'pytz',
         'pydot',
         'rich',
-        'sklearn>=1.1.0'
+        'scikit-learn>=1.1.0'
     ],
     package_data={pkg: ['data/*.dat', 'data/*.gz']},
     tests_require=['pytest'],
