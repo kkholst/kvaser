@@ -4,6 +4,7 @@
 # Copyright (c) 2019-2022 Klaus K. Holst.  All rights reserved.
 
 import numpy as np
+import sklearn.linear_model as glm
 
 def randgen(func):
     def wrapper(*args, **kwargs):
@@ -67,6 +68,12 @@ class Dist:
         res = self.gen(param=mpar, **self.kparam, rng=rng)
         return res
 
+    @staticmethod
+    def estimate(y, X=None, **kwargs):
+        r"""Estimation method
+        """
+        return None, None
+
     def __repr__(self):
         return self.name + ' distribution ' + \
             str(self.kparam)
@@ -91,6 +98,12 @@ class normal(Dist):
         res = rng.normal(loc=param, **kwargs)
         return res
 
+    @staticmethod
+    def estimate(y, X):
+        fit = glm.LinearRegression(fit_intercept=False) \
+                 .fit(X=X, y=y)
+        return fit.coef_, X
+
 
 class bernoulli(Dist):
     name = 'Binomial'
@@ -101,6 +114,12 @@ class bernoulli(Dist):
     @staticmethod
     def invlink(x):
         return(1/(1+np.exp(-np.array(x))))
+
+    @staticmethod
+    def estimate(y, X):
+        fit = glm.LogisticRegression(penalty='none', fit_intercept=False) \
+                 .fit(X=X, y=y)
+        return fit.coef_, X
 
 
 class poisson(Dist):
@@ -114,6 +133,12 @@ class poisson(Dist):
     def invlink(x):
         return(np.exp(np.array(x)))
 
+    @staticmethod
+    def estimate(y, X):
+        fit = glm.PoissonRegressor(alpha=0, fit_intercept=False) \
+                  .fit(X=X, y=y)
+        return fit.coef_, X
+
 
 class discrete(Dist):
     name = 'Discrete'
@@ -126,3 +151,7 @@ class discrete(Dist):
     @randgen
     def gen(self, param, rng, **kwargs):
         return rng.choice(a=self.values, p=self.p, size=len(param))
+
+    @staticmethod
+    def estimate(y, X=None):
+        return None, None
