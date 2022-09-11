@@ -29,8 +29,8 @@ class dag:
         y ~ x + z
         x ~ v
         z ~ x + w
-        w ~
-        v ~
+        w ~ 1
+        v ~ 1
 
         y: Normal distribution {'scale': 2}
         x: Binomial distribution {}
@@ -65,9 +65,10 @@ class dag:
         Constructor
         """
         self.G = nx.DiGraph()
-        self.dist = {}
+        self._distribution = {}
+        self._functionalform = {}
 
-    def regression(self, y, x=[]):
+    def regression(self, y, x=[], f=None):
         r"""Add regression association between response 'y' and list of covariates 'x'
 
         Parameters
@@ -78,12 +79,13 @@ class dag:
            covariate names
         """
         self.G.add_node(y)
-        if y not in self.dist.keys():
+        if y not in self._distribution.keys():
             self.distribution(y)
         for v in x:
             self.G.add_edge(v, y)
-            if v not in self.dist.keys():
+            if v not in self._distribution.keys():
                 self.distribution(v)
+                self._functionalform[v] = f
         return self
 
     def distribution(self, y, generator=kv.normal()):
@@ -124,7 +126,7 @@ class dag:
 
         """
         self.G.add_node(y)
-        self.dist[y] = generator
+        self._distribution[y] = generator
         return self
 
     def simulate(self, n=1, p={}, file=None, rng=None):
@@ -190,7 +192,7 @@ class dag:
                             pname = v + '~' + x
                             posx = int(vv.index(x))
                             lp += p0[pname]*res[:,posx]
-                        y = np.float64(self.dist[v].simulate(lp=lp, rng=rng))
+                        y = np.float64(self._distribution[v].simulate(lp=lp, rng=rng))
                         res[:,pos] = y
         df = pd.DataFrame(res)
         df.columns = vv
@@ -207,7 +209,7 @@ class dag:
             if len(parents)==0:
                 parents = "1"
             formula = v + ' ~ ' + ' + '.join(parents)
-            dist = self.dist[v]
+            dist = self._distribution[v]
             res[v] = (formula, dist)
         return res
 
@@ -279,7 +281,7 @@ class dag:
             st += '\n'
         for f in self.summary().values():
             st += '\n' + f[0]
-        for k,v in self.dist.items():
+        for k,v in self._distribution.items():
             st += '\n' + str(k) + ': ' + str(v)
         return st
 
