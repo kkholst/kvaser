@@ -10,6 +10,8 @@ import pandas as pd
 from PIL import Image # Python Imaging library
 from io import BytesIO
 import pydot # graphviz/dot
+import patsy
+
 
 class dag:
     r"""DAG model class
@@ -82,6 +84,7 @@ class dag:
             self.G.add_edge(v, y)
             if v not in self.dist.keys():
                 self.distribution(v)
+        return self
 
     def distribution(self, y, generator=kv.normal()):
         r"""Set distribution of variable
@@ -122,6 +125,7 @@ class dag:
         """
         self.G.add_node(y)
         self.dist[y] = generator
+        return self
 
     def simulate(self, n=1, p={}, file=None, rng=None):
         r"""Simulate from model
@@ -195,6 +199,74 @@ class dag:
             return None
         return df
 
+    def summary(self):
+        r"""Summary method"""
+        res = {}
+        for v in self.G.nodes:
+            parents = list(self.G.predecessors(v))
+            if len(parents)==0:
+                parents = "1"
+            formula = v + ' ~ ' + ' + '.join(parents)
+            dist = self.dist[v]
+            res[v] = (formula, dist)
+        return res
+
+    def design(self, data):
+        r"""Extract model design matrix
+
+        Parameters
+        ----------
+        data: pandas.DataFrame
+              DataFrame with all variables in the model (as returned by the simulate method)
+
+        Returns
+        ----------
+        Dict
+           Dictonary which for each variable name contains a tuple
+           y, X of response and design matrix values
+
+        """
+        res = {}
+        mod = self.summary()
+        for v in mod.keys():
+            f = mod[v][0]
+            y, X = patsy.dmatrices(f, data=data)
+            res[v] = (y, X)
+        return res
+
+    def estimate(self, data):
+        r"""Estimate model parameters
+
+        Parameters
+        ----------
+        data: pandas.DataFrame
+              DataFrame with all variables in the model (as returned by the simulate method)
+
+        Returns
+        ----------
+        Dict
+           Dictonary which for each variable name contains a dictonary with elements
+           'coef' (regression coefficients) and 'ic' (influence curve).
+
+        Examples
+        ----------
+
+        >>> m = kv.dag().regression('y', 'x').distribution('y', poisson())
+        >>> d = m.simulate(1000)
+        >>> m.estimate(d)['y']
+            {'coef': array([-0.01545999,  0.96640726]), 'ic': ...}
+
+        """
+        res = {}
+        mod = self.summary()
+        for v in mod.keys():
+            dist = mod[v][1]
+            f = mod[v][0]
+            y, X = patsy.dmatrices(f, data=data)
+            coef, influ = dist.estimate(y=y.ravel(), X=X)
+            res[v] = {'coef': coef, 'ic': influ}
+        return res
+
     def plot(self):
         r"""Plot DAG model
         """
@@ -202,13 +274,13 @@ class dag:
         Image.open(BytesIO(pdot.create_png())).show()
 
     def __str__(self):
-        st = ''
-        for v in self.G.nodes:
-            parents = list(self.G.predecessors(v))
-            st += v + ' ~ ' + ' + '.join(parents) + '\n'
-        st += '\n'
+        st = 'DAG model class'
+        if len(self.G.nodes)>0:
+            st += '\n'
+        for f in self.summary().values():
+            st += '\n' + f[0]
         for k,v in self.dist.items():
-            st += str(k) + ': ' + str(v) + '\n'
+            st += '\n' + str(k) + ': ' + str(v)
         return st
 
 

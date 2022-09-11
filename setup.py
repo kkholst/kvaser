@@ -38,17 +38,18 @@ setuptools.setup(
     ],
     scripts=list(map(lambda x: 'bin/'+x, os.listdir('bin'))),
     install_requires=[
-        'pandas>=1.0.3',
-        'numpy>=1.15',
-        'rich',
+        'azure-storage-blob>=12.0'
         'datetime',
+        'networkx',
+        'numpy>=1.15',
+        'pandas>=1.0.3',
+        'patsy>=0.5.0',
+        'Pillow',
         'plotly>=5.1.0',
         'pytz',
-        'networkx',
         'pydot',
-        'Pillow',
-        #'pyarrow>=1.0',
-        'azure-storage-blob>=12.0'
+        'rich',
+        'sklearn>=1.1.0'
     ],
     package_data={pkg: ['data/*.dat', 'data/*.gz']},
     tests_require=['pytest'],
