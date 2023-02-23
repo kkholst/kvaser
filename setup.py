@@ -1,8 +1,5 @@
-import sys, os, subprocess, sysconfig
-from distutils import sysconfig
+import os
 import setuptools
-import re
-import platform
 
 pkg = 'kvaser'
 

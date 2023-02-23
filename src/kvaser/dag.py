@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from PIL import Image # Python Imaging library
 from io import BytesIO
-import pydot # graphviz/dot
 import patsy
 
 
@@ -79,6 +78,7 @@ class dag:
            covariate names
         """
         self.G.add_node(y)
+        self._functionalform[y] = f
         if y not in self._distribution.keys():
             self.distribution(y)
         for v in x:
@@ -188,10 +188,17 @@ class dag:
                         deg[v] = -1
                         pos = vv.index(v)
                         lp = np.repeat([float(p0[v])], n)
-                        for x in par:
-                            pname = v + '~' + x
-                            posx = int(vv.index(x))
-                            lp += p0[pname]*res[:,posx]
+                        if len(par)>0:
+                            f = self._functionalform[v]
+                            if f is None:
+                                for x in par:
+                                    pname = v + '~' + x
+                                    posx = int(vv.index(x))
+                                    lp += p0[pname]*res[:,posx]
+                            else:
+                                idx = np.array([vv.index(x) for x in par], dtype="int64")
+                                lp = np.array(f(res[:,idx])).flatten()
+                        print(lp)
                         y = np.float64(self._distribution[v].simulate(lp=lp, rng=rng))
                         res[:,pos] = y
         df = pd.DataFrame(res)
@@ -277,10 +284,11 @@ class dag:
 
     def __str__(self):
         st = 'DAG model class'
-        if len(self.G.nodes)>0:
-            st += '\n'
+        nvar = len(self.G.nodes)
+        if nvar>0: st += '\n'
         for f in self.summary().values():
             st += '\n' + f[0]
+        if nvar>0: st += '\n'
         for k,v in self._distribution.items():
             st += '\n' + str(k) + ': ' + str(v)
         return st
