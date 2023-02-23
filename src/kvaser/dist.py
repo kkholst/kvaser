@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Distribution classes
-# Copyright (c) 2019-2022 Klaus K. Holst.  All rights reserved.
+# Copyright (c) 2019-2023 Klaus K. Holst.  All rights reserved.
 
 import numpy as np
 import sklearn.linear_model as glm

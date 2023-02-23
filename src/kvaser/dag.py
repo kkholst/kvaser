@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Simulation class
-# Copyright (c) 2019-2022 Klaus K. Holst.  All rights reserved.
+# Copyright (c) 2019-2023 Klaus K. Holst.  All rights reserved.
 
 import kvaser as kv
 import networkx as nx
