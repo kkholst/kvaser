@@ -52,11 +52,37 @@ class dag:
         4998   4.043192  1.0  0.0 -1.0  2.0
         4999   4.402478  1.0  1.0 -1.0  2.0
 
-    >>> # import statsmodels.formula.api as smf
-    >>> # import statsmodels.genmod.families as fam
+    >>> import statsmodels.formula.api as smf
+    >>> import statsmodels.genmod.families as fam
     >>> # smf.glm('y ~ x+z', data=r, family=fam.Gaussian()).fit().summary()
     >>> # smf.glm('z ~ x', data=r, family=fam.Poisson()).fit().summary()
     >>> # smf.glm('x ~ 1', data=r, family=fam.Binomial()).fit().summary()
+
+    Non-linear association
+    >>> m = kv.dag()
+    >>> m.regression('y', ['x','z'], f=lambda x: x[:,0]*x[:,1]**2)
+    >>> d = m.simulate(1e3)
+    >>> smf.glm('y ~ x*I(z**2)', data=d, family=fam.Gaussian()).fit().summary()
+
+                             Generalized Linear Model Regression Results
+        ==============================================================================
+        Dep. Variable:                      y   No. Observations:                 1000
+        Model:                            GLM   Df Residuals:                      996
+        Model Family:                Gaussian   Df Model:                            3
+        Link Function:               identity   Scale:                          1.0447
+        Method:                          IRLS   Log-Likelihood:                -1438.8
+        Date:                Thu, 23 Feb 2023   Deviance:                       1040.5
+        Time:                        20:26:27   Pearson chi2:                 1.04e+03
+        No. Iterations:                     3   Pseudo R-squ. (CS):             0.9236
+        Covariance Type:            nonrobust
+        ===============================================================================
+                          coef    std err          z      P>|z|      [0.025      0.975]
+        -------------------------------------------------------------------------------
+        Intercept       0.1071      0.040      2.664      0.008       0.028       0.186
+        x               0.0612      0.039      1.579      0.114      -0.015       0.137
+        I(z ** 2)      -0.0138      0.024     -0.582      0.561      -0.060       0.033
+        x:I(z ** 2)     0.9617      0.024     39.736      0.000       0.914       1.009
+        ===============================================================================
     """
 
     def __init__(self):
@@ -85,7 +111,7 @@ class dag:
             self.G.add_edge(v, y)
             if v not in self._distribution.keys():
                 self.distribution(v)
-                self._functionalform[v] = f
+                #self._functionalform[v] = f
         return self
 
     def distribution(self, y, generator=kv.normal()):
@@ -198,7 +224,6 @@ class dag:
                             else:
                                 idx = np.array([vv.index(x) for x in par], dtype="int64")
                                 lp = np.array(f(res[:,idx])).flatten()
-                        print(lp)
                         y = np.float64(self._distribution[v].simulate(lp=lp, rng=rng))
                         res[:,pos] = y
         df = pd.DataFrame(res)

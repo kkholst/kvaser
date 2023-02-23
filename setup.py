@@ -35,7 +35,7 @@ setuptools.setup(
     ],
     scripts=list(map(lambda x: 'bin/'+x, os.listdir('bin'))),
     install_requires=[
-        'azure-storage-blob>=12.0'
+        'azure-storage-blob>=12.0',
         'datetime',
         'networkx',
         'numpy>=1.15',
