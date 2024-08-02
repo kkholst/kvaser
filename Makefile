@@ -32,7 +32,7 @@ default: install
 
 .PHONY: update
 update:
-	$(PIP) install wheel setuptools twine --upgrade
+	$(PIP) install wheel setuptools twine build --upgrade
 
 UID := $(shell id -u)
 PWD := $(shell pwd)
@@ -40,15 +40,13 @@ PWD := $(shell pwd)
 DOCKERRUN = $(CONTAINER_RUNTIME) run -ti --rm --privileged --user $(UID):0 --network=host -v $(PWD):/io buildmany
 
 build: clean
-	$(PYTHON) setup.py bdist_wheel -d dist
-	$(MAKE) source
+	$(PYTHON) -m build
 
-source:
-	$(PYTHON) setup.py sdist
+source: build
 
 .PHONY: clean
 clean:
-	@rm -Rf dist/* *.egg-info build *.so *.so.* src/*.egg-info tests/bin/*
+	@rm -Rf dist/* *.egg-info build *.so *.so.* src/*.egg-info tests/bin/* dist
 
 .PHONY: upload_test
 upload_test:
@@ -64,7 +62,7 @@ uninstall:
 
 .PHONY: install
 install: uninstall
-	$(PYTHON) setup.py install
+	$(PIP) install .
 	rm -Rf *.egg-info
 
 .PHONY: installdev
