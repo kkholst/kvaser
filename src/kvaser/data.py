@@ -7,7 +7,7 @@ import pkg_resources
 import pandas as pd
 
 
-def getdata(dataset:str='d', list:bool=False):
+def getdata(dataset: str = 'd', list: bool = False):
     """Load example data from the 'kvaser' package
 
     Parameters

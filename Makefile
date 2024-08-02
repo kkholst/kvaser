@@ -72,12 +72,12 @@ installdev:
 	$(PIP) install -e .
 
 .PHONY: check
-check:
-	$(PYTHON) setup.py flake8
+check: test
+	@flake8
 
 .PHONY: test
 test:
-	$(PYTHON) setup.py test
+	@pytest
 
 .PHONY: cov
 cov: coverage

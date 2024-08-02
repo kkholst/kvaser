@@ -103,8 +103,7 @@ def plot(y, upper=None, lower=None,
                                        xref='x', x0=highlight_start, x1=highlight_start,
                                        line=dict(color=highlight_color,
                                                  width=3,
-                                                 dash="dot")
-                                    )])
+                                                 dash="dot"))])
         fig.add_vrect(x0=first, x1=highlight_start,
                       fillcolor=highlight_fill, opacity=0.2, line_width=0)
         fig.add_vrect(x0=highlight_start, x1=last,

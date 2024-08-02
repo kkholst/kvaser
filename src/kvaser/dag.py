@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 # Simulation class
-# Copyright (c) 2019-2023 Klaus K. Holst.  All rights reserved.
+# Copyright (c) 2019-2024 Klaus K. Holst.  All rights reserved.
 
 import kvaser as kv
 import networkx as nx
 import numpy as np
 import pandas as pd
-from PIL import Image # Python Imaging library
+from PIL import Image  # Python Imaging library
 from io import BytesIO
 import patsy
 
@@ -94,7 +94,8 @@ class dag:
         self._functionalform = {}
 
     def regression(self, y, x=[], f=None):
-        r"""Add regression association between response 'y' and list of covariates 'x'
+        r"""Add regression association between response 'y' and list of
+        covariates 'x'
 
         Parameters
         ----------
@@ -111,7 +112,6 @@ class dag:
             self.G.add_edge(v, y)
             if v not in self._distribution.keys():
                 self.distribution(v)
-                #self._functionalform[v] = f
         return self
 
     def distribution(self, y, generator=kv.normal()):
@@ -137,7 +137,7 @@ class dag:
         >>> class mydist(kv.Dist):
         >>> @kv.randgen
         >>> def gen(self, param, **kwargs):
-                return np.repeat([1,2], len(param)/2)
+        >>>     return np.repeat([1,2], len(param)/2)
 
         'param' is a parameter array derived from the regression design -
         typically the mean parameter.
@@ -171,11 +171,12 @@ class dag:
 
         Notes
         ----------
-        Parameters are default 0 for all intercepts and 1 for all other regression coefficients.
-        This can be changed for a subset of the parameters via the argument 'p'.
-        'p' must be a dictionary where the keys are the names of the parameters where intercept parameters
-        are simply the name of the variable, e.g., 'y', and the regression coefficients are named as
-        'y~x' (response y and covariate x). For examples
+        Parameters are default 0 for all intercepts and 1 for all other
+        regression coefficients. This can be changed for a subset of the
+        parameters via the argument 'p'. 'p' must be a dictionary where the keys
+        are the names of the parameters where intercept parameters are simply
+        the name of the variable, e.g., 'y', and the regression coefficients are
+        named as 'y~x' (response y and covariate x). For examples
 
         >>> m = kv.dag()
         >>> m.regression('y', ['x','z'])
@@ -183,7 +184,7 @@ class dag:
         >>> p = {'y': -1, 'y~x': 2}
         >>> m.simulate(10, p=p)
 
-        which draws 10 simulations from the model
+        which draws 10 independent observations from the model
 
         .. math:: y|x,z \sim \operatorname{pois}\left\{\exp(-1 + 2x + z)\right\}
 
@@ -205,27 +206,27 @@ class dag:
                 if pname in p.keys():
                     p0[pname] = p[pname]
 
-        while any(x>=0 for x in deg.values()):
+        while any(x >= 0 for x in deg.values()):
             for v, d in deg.items():
-                if d>=0:
+                if d >= 0:
                     par = list(self.G.predecessors(v))
                     subdict = dict((k, deg[k]) for k in par if k in deg)
-                    if all(x<0 for x in subdict.values()):
+                    if all(x < 0 for x in subdict.values()):
                         deg[v] = -1
                         pos = vv.index(v)
                         lp = np.repeat([float(p0[v])], n)
-                        if len(par)>0:
+                        if len(par) > 0:
                             f = self._functionalform[v]
                             if f is None:
                                 for x in par:
                                     pname = v + '~' + x
                                     posx = int(vv.index(x))
-                                    lp += p0[pname]*res[:,posx]
+                                    lp += p0[pname]*res[:, posx]
                             else:
                                 idx = np.array([vv.index(x) for x in par], dtype="int64")
-                                lp = np.array(f(res[:,idx])).flatten()
+                                lp = np.array(f(res[:, idx])).flatten()
                         y = np.float64(self._distribution[v].simulate(lp=lp, rng=rng))
-                        res[:,pos] = y
+                        res[:, pos] = y
         df = pd.DataFrame(res)
         df.columns = vv
         if file is not None:
@@ -238,7 +239,7 @@ class dag:
         res = {}
         for v in self.G.nodes:
             parents = list(self.G.predecessors(v))
-            if len(parents)==0:
+            if len(parents) == 0:
                 parents = "1"
             formula = v + ' ~ ' + ' + '.join(parents)
             dist = self._distribution[v]
@@ -310,12 +311,12 @@ class dag:
     def __str__(self):
         st = 'DAG model class'
         nvar = len(self.G.nodes)
-        if nvar>0: st += '\n'
+        if nvar > 0:
+            st += '\n'
         for f in self.summary().values():
             st += '\n' + f[0]
-        if nvar>0: st += '\n'
-        for k,v in self._distribution.items():
+        if nvar > 0:
+            st += '\n'
+        for k, v in self._distribution.items():
             st += '\n' + str(k) + ': ' + str(v)
         return st
-
-

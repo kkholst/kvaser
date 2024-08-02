@@ -4,6 +4,7 @@
 
 import pandas as pd
 
+
 def filesize(size, digits=2):
     r"""From bytes to kilo, mega, giga, tera
     """
@@ -13,10 +14,11 @@ def filesize(size, digits=2):
         return size, Dic_powerN[0]
     n = 0
     while size > power:
-        n  += 1
+        n += 1
         size /= power
-    size = round(size*(10**digits))/(10**digits)
+    size = round(size*(10**digits)) / (10**digits)
     return size, Dic_powerN[n]
+
 
 def desc(x):
     r"""Summary statistics for Pandas/NumPy type objecte
@@ -55,4 +57,3 @@ def desc(x):
     except Exception as ex:
         raise TypeError("Expecting Pandas compatible type") from ex
     return x.describe()
-

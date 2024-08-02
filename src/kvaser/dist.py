@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 # Distribution classes
-# Copyright (c) 2019-2023 Klaus K. Holst.  All rights reserved.
+# Copyright (c) 2019-2024 Klaus K. Holst.  All rights reserved.
 
 import numpy as np
 import sklearn.linear_model as glm
 
+
 def randgen(func):
     def wrapper(*args, **kwargs):
-        if len(args)>0:
+        if len(args) > 0:
             kwargs.setdefault('rng', args[0].rng)
             if kwargs.get('rng') is None:
                 kwargs['rng'] = args[0].rng
         res = func(*args, **kwargs)
         return res
-        ## After the function is called...
+        # After the function is called...
     return wrapper
+
 
 class Dist:
     r"""Probability distribution class.
@@ -107,6 +109,7 @@ class normal(Dist):
 
 class bernoulli(Dist):
     name = 'Binomial'
+
     @randgen
     def gen(self, param, rng, **kwargs):
         return self.rng.binomial(p=param, n=1, **kwargs)
@@ -125,6 +128,7 @@ class bernoulli(Dist):
 class poisson(Dist):
     name = 'Poisson'
     meanpar = 'lam'
+
     @randgen
     def gen(self, param, rng, **kwargs):
         return rng.poisson(lam=param, **kwargs)
@@ -143,7 +147,7 @@ class poisson(Dist):
 class discrete(Dist):
     name = 'Discrete'
 
-    def __init__(self, values=[0,1], p=[0.5,0.5], **kwargs):
+    def __init__(self, values=[0, 1], p=[0.5, 0.5], **kwargs):
         super().__init__()
         self.values = np.array(values)
         self.p = np.array(p)
